@@ -1,4 +1,5 @@
-﻿//异步请求方法
+﻿
+//异步请求方法
 function ajax(ApiType, FileAddress, JsonData, BookMethod) {
     $.ajax({
         type: ApiType,
@@ -182,7 +183,7 @@ function BookOne(data) {
     var json = JSON.parse(data);
 
     if (json.state == 100) {
-
+        var optionstring;
         cxISBN = json.data[0].ISBN;
         cxBookName = json.data[0].BookName;
         cxBookType = json.data[0].BookType;
@@ -192,10 +193,86 @@ function BookOne(data) {
 
         $("#ISBN").val(cxISBN);
         $("#BookName").val(cxBookName);
-        $("#BookType").val(cxBookType);
+        //$("#BookType").val(cxBookType);
         $("#Author").val(cxAuthor);
         $("#Price").val(cxPrice);
         $("#Publishing").val(cxPublishing);
+
+        
+        //生成图书类别选择框
+        for (var i = 0; i < json.type.length; i++) {
+            if (json.type[i] == cxBookType) {
+                optionstring += '<option value=\"' + json.type[i] + '\" selected="" >' + json.type[i] + '</option>';
+            }
+            else {
+                optionstring += '<option value=\"' + json.type[i] + '\">' + json.type[i] + '</option>';
+            }   
+        }
+
+        if (json.type.length > 0) {
+            $("#BookType").empty();  //删除子元素
+        }
+        $("#BookType").append(optionstring);  //添加子元素
+    }
+    else {
+        layer.alert(json.msg, { icon: 5 });
+    }
+}
+
+//修改
+function AlterBooklist(data) {
+    var json = JSON.parse(data);
+
+    if (json.state == 1) {
+        layer.alert(json.msg, { icon: 6 });
+
+        setTimeout(function () {
+            var layerindex = parent.layer.getFrameIndex(window.name);
+            parent.layer.close(layerindex);
+        }, 2000);
+    }
+    else {
+        layer.alert(json.msg, { icon: 5 });
+    }
+}
+
+//添加页面图书列表
+function SelectType(data) {
+    var json = JSON.parse(data);
+
+    if (json.state == 1) {
+        var optionstring;
+
+        for (var i = 0; i < json.data.length; i++) {
+            optionstring += '<option value = "' + json.data[i].BOOKTYPENAME + '" >' + json.data[i].BOOKTYPENAME + '</option>';
+        }
+
+        $("#BookType").append(optionstring);
+    }
+    else {
+        layer.alert(json.msg, { icon: 5 });
+    }
+}
+
+function leftbooknav(data) {
+    var json = JSON.parse(data);
+
+    if (json.state == 1) {
+        var navString;
+
+        for (var i = 0; i < json.data.length; i++) {
+            if (i == 0) {
+                navString = '<dd><a href="'+ json.data[0].BOOKTYPEURL +'" target="BookIframe" >' + json.data[0].BOOKTYPENAME + '</a></dd>';
+            }
+            else {
+                navString += '<dd><a href="' + json.data[i].BOOKTYPEURL +'" target="BookIframe" >' + json.data[i].BOOKTYPENAME + '</a></dd>';
+            } 
+        }
+
+        if (json.data.length > 0) {
+            $("#Booknav").empty();
+        }
+        $("#Booknav").append(navString);
     }
     else {
         layer.alert(json.msg, { icon: 5 });

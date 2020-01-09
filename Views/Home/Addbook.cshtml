@@ -41,9 +41,12 @@
 
         <div class="layui-form-item">
             <div class="layui-inline">
-                <label class="layui-form-label">类别：</label>
+                <label class="layui-form-label">图书类别：</label>
                 <div class="layui-input-inline">
-                    <input type="text" id="BookType" name="BookType" placeholder="请输入图书类别" class="layui-input">
+                    @*<input type="text" id="BookType" name="BookType" placeholder="请输入图书类别" class="layui-input">*@
+                    <select id="BookType" name="BookType" class="layui-input">
+                        <option value="" selected>请选择图书类别</option>
+                    </select>
                 </div>
             </div>
         </div>
@@ -90,6 +93,10 @@
         });
 
         $(document).ready(function () {
+
+            var JsonData = { empty: "0" };
+            var BookMethod = SelectType;
+            ajax("GET", "SelectBooktype", JsonData, BookMethod);
 
             //确定
             $("#Addbook").on("click", function () {

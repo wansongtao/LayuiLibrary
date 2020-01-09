@@ -67,7 +67,8 @@ namespace Library.Controllers
             return View();
         }
 
-        public IActionResult Book()
+
+        public IActionResult Literature()
         {
             return View();
         }
@@ -91,7 +92,7 @@ namespace Library.Controllers
                 {
                     string sql = "select ID from BookUser where UserName = :userAcc and UserPwd = :passwd";
 
-                    int Loginlist = conn.Query<BookUser>(sql, new { userAcc, passwd }).Count();
+                    int Loginlist = conn.Query(sql, new { userAcc, passwd }).Count();
 
                     if(Loginlist == 1)
                     {
@@ -123,15 +124,9 @@ namespace Library.Controllers
             {
                 using(OracleConnection conn = new OracleConnection(OracleConnectionString))
                 {
-                    string sql = "select count(BookId) as BookId from Book where Isdelete = :Isdelete";
+                    string sql = "select BookId from Book where Isdelete = :Isdelete";
 
-                    var allcount = conn.Query<Book>(sql, new { Isdelete = 0 }).ToList();
-                    int records = 0;
-
-                    foreach (var item in allcount)
-                    {
-                        records = item.BookId;
-                    }
+                    int records = conn.Query(sql, new { Isdelete = 0 }).Count();
 
                     if(records > 0)
                     {
@@ -260,9 +255,9 @@ namespace Library.Controllers
                 using(OracleConnection conn = new OracleConnection(OracleConnectionString))
                 {
                     string seachsql = "select BookId from Book where ISBN = :ISBN";
-                    var seachlist = conn.Query<Book>(seachsql, new { ISBN }).ToList();
+                    int seachlist = conn.Query(seachsql, new { ISBN }).Count();
 
-                    if(seachlist.Count > 0)
+                    if(seachlist > 0)
                     {
                         state = 0;
                         msg = "ISBN码重复";
@@ -343,7 +338,7 @@ namespace Library.Controllers
             }
         }
 
-        //根据ID查询一条数据
+        //根据ID查询一条数据和图书类别
         public string BookOne(int ID)
         {
             try
@@ -351,22 +346,38 @@ namespace Library.Controllers
                 using(OracleConnection conn = new OracleConnection(OracleConnectionString))
                 {
                     string sql = "select ISBN, BookName, BookType, Author, Price, Publishing from Book " +
-                        " where Isdelete = :Isdelete and BookId = :ID";
+                        " where BookId = :ID";
+                    string type = "[]";
 
-                    var bookone = conn.Query<Book>(sql, new { Isdelete = 0, ID }).ToList();
+                    var bookone = conn.Query<Book>(sql, new { ID }).ToList();
 
                     if (bookone.Count > 0)
                     {
-                        state = 100;
-                        msg = "查询成功";
-                        json = JsonConvert.SerializeObject(bookone);
+                        string sqltype = "select BookTypeName from BookType where Isdelete = :Isdelete";
+
+                        var booktwo = conn.Query<BookType>(sqltype, new { Isdelete = 0 }).Select(it => it.BookTypeName).ToList();
+
+                        if(booktwo.Count > 0)
+                        {
+                            state = 100;
+                            msg = "查询成功";
+                            json = JsonConvert.SerializeObject(bookone);
+                            type = JsonConvert.SerializeObject(booktwo);
+                        }
+                        else
+                        {
+                            state = 0;
+                            msg = "获取图书类别失败";
+                            json = "[]";
+                        }
                     }
                     else
                     {
                         state = 0;
                         msg = "获取数据失败";
+                        json = "[]";
                     }
-                    json = "{\"state\": " + state + ", \"msg\": \"" + msg + "\", \"data\": "+ json +"}";
+                    json = "{\"state\": " + state + ", \"msg\": \"" + msg + "\", \"data\": "+ json +", \"type\": "+ type +"}";
                 }
                 return json;
             }
@@ -375,6 +386,78 @@ namespace Library.Controllers
                 state = 0;
                 msg = ex.Message;
                 json = "{\"state\": " + state + ", \"msg\": \"" + msg + "\", \"data\": []}";
+                return json;
+            }
+        }
+
+        //修改
+        public string AlterBooklist(int ID, string ISBN, string BookName, string BookType,
+            string Author, decimal Price, string Publishing)
+        {
+            try
+            {
+                using(OracleConnection conn = new OracleConnection(OracleConnectionString))
+                {
+                    string sql = "update Book set ISBN = :ISBN, BookName = :BookName, BookType = :BookType," +
+                        " Author = :Author, Price = :Price, Publishing = :Publishing where BookId = :ID";
+
+                    int alterbook = conn.Execute(sql, new { ID, ISBN, BookName, BookType, Author, Price, Publishing });
+
+                    if(alterbook > 0)
+                    {
+                        state = 1;
+                        msg = "修改成功";
+                    }
+                    else
+                    {
+                        state = 0;
+                        msg = "修改失败";
+                    }
+                }
+
+                json = "{\"state\": " + state + ", \"msg\": \"" + msg + "\"}";
+                return json;
+            }
+            catch(Exception ex)
+            {
+                state = 0;
+                msg = ex.Message;
+                json = "{\"state\": " + state + ", \"msg\": \"" + msg + "\"}";
+                return json;
+            }
+        }
+
+        //获取图书类别
+        public string SelectBooktype()
+        {
+            try
+            {
+                using(OracleConnection conn = new OracleConnection(OracleConnectionString))
+                {
+                    string sql = "select BookTypeName, BookTypeUrl from BookType where Isdelete = :Isdelete";
+
+                    var booktype = conn.Query(sql, new { Isdelete = 0 }).ToList();
+
+                    if(booktype.Count > 0)
+                    {
+                        json = JsonConvert.SerializeObject(booktype);
+                        state = 1;
+                        msg = "操作成功";
+                    }
+                    else
+                    {
+                        state = 0;
+                        msg = "获取图书类别列表失败";
+                    }
+                }
+                json = "{\"state\": " + state + ", \"msg\": \"" + msg + "\", \"data\": " + json + "}";
+                return json;
+            }
+            catch(Exception ex)
+            {
+                state = 0;
+                msg = ex.Message;
+                json = "{\"state\": " + state + ", \"msg\": \"" + msg + "\"}";
                 return json;
             }
         }

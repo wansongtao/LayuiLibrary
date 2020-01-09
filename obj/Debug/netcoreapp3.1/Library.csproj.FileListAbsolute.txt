@@ -108,7 +108,6 @@ C:\Library\obj\Debug\netcoreapp3.1\Library.dll
 C:\Library\obj\Debug\netcoreapp3.1\Library.pdb
 C:\Library\obj\Debug\netcoreapp3.1\Razor\Views\Home\Login.cshtml.g.cs
 C:\Library\obj\Debug\netcoreapp3.1\Razor\Views\Home\Index.cshtml.g.cs
-C:\Library\obj\Debug\netcoreapp3.1\Razor\Views\Home\Book.cshtml.g.cs
 C:\Library\obj\Debug\netcoreapp3.1\Razor\Views\Home\Addbook.cshtml.g.cs
-C:\Library\obj\Debug\netcoreapp3.1\Library.csprojAssemblyReference.cache
 C:\Library\obj\Debug\netcoreapp3.1\Razor\Views\Home\AlterBook.cshtml.g.cs
+C:\Library\obj\Debug\netcoreapp3.1\Razor\Views\Home\Literature.cshtml.g.cs
