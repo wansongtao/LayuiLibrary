@@ -87,55 +87,59 @@
     </div>
 
     <script>
-        var layer;
+
         layui.use('layer', function () {
-            layer = layui.layer;
-        });
+            var layer = layui.layer;
 
-        $(document).ready(function () {
+            $(document).ready(function () {
 
-            var JsonData = { empty: "0" };
-            var BookMethod = SelectType;
-            ajax("GET", "SelectBooktype", JsonData, BookMethod);
+                var JsonData = { empty: "0" };
+                var BookMethod = SelectType;
+                ajax("GET", "SelectBooktype", JsonData, BookMethod);
 
-            //确定
-            $("#Addbook").on("click", function () {
+                //确定
+                $("#Addbook").on("click", function () {
 
-                var ISBN = $("#ISBN").val();
-                var BookName = $("#BookName").val();
-                var BookType = $("#BookType").val();
-                var Author = $("#Author").val();
-                var Price = $("#Price").val();
-                var Publishing = $("#Publishing").val();
+                    var ISBN = $("#ISBN").val();
+                    var BookName = $("#BookName").val();
+                    var BookType = $("#BookType").val();
+                    var Author = $("#Author").val();
+                    var Price = $("#Price").val();
+                    var Publishing = $("#Publishing").val();
 
-                if (ISBN != "" && BookName != "" && BookType != "" && Author != "" && Price != "" && Publishing != "") {
+                    if (ISBN != "" && BookName != "" && BookType != "" && Author != "" && Price != "" && Publishing != "") {
 
-                    var Priceformat = /(^[1-9]([0-9]+)?(\.[0-9]{1,2})?$)|(^(0){1}$)|(^[0-9]\.[0-9]([0-9])?$)/;  //匹配两位小数金额的正则表达式
+                        var Priceformat = /(^[1-9]([0-9]+)?(\.[0-9]{1,2})?$)|(^(0){1}$)|(^[0-9]\.[0-9]([0-9])?$)/;  //匹配两位小数金额的正则表达式
 
-                    if (Priceformat.test(Price)) {
-                        var JsonData = {
-                            ISBN: ISBN, BookName: BookName, BookType: BookType,
-                            Author: Author, Price: Price, Publishing: Publishing
-                        };
+                        if (Priceformat.test(Price)) {
+                            var JsonData = {
+                                ISBN: ISBN, BookName: BookName, BookType: BookType,
+                                Author: Author, Price: Price, Publishing: Publishing
+                            };
 
-                        var BookMethod = BookAdd;
-                        ajax("POST", "BookAddOne", JsonData, BookMethod);
+                            var BookMethod = BookAdd;
+                            ajax("POST", "BookAddOne", JsonData, BookMethod);
+                        }
+                        else {
+                            layer.alert('价格格式错误', { icon: 5 });
+                        }
                     }
                     else {
-                        layer.alert('价格格式错误', { icon: 5 });
+                        layer.alert('请输入所有信息', { icon: 5 });
                     }
-                }
-                else {
-                    layer.alert('请输入所有信息', { icon: 5 });
-                }
+                });
+
+                //取消
+                $("#cancel").on("click", function () {
+                    localStorage.setItem('addLoading', '0');  //将addloading=0存储到本地，用作重载判断
+                    var layerindex = parent.layer.getFrameIndex(window.name);  //获取窗口索引
+                    parent.layer.close(layerindex);  //关闭窗口
+                });
             });
 
-            //取消
-            $("#cancel").on("click", function () {
-                var layerindex = parent.layer.getFrameIndex(window.name);  //获取窗口索引
-                parent.layer.close(layerindex);  //关闭窗口
-            });
         });
+
+        
     </script>
 
 </body>

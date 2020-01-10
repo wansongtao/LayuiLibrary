@@ -17,7 +17,10 @@ function Login(data) {
     var json = JSON.parse(data);
 
     if (json.state == 1) {
-        setTimeout("top.location.replace('Home/Index')", "1000");
+        //setTimeout("top.location.replace('Home/Index')", "1000");
+        setTimeout(function () {
+            window.location.href = "Home/Index";
+        }, 1000);
     }
     else {
         layer.alert(json.msg, { icon: 5 });
@@ -26,64 +29,63 @@ function Login(data) {
 }
 
 //layui table 赋值
-function Book() {
+function Book(table, PageBookType) {
 
-    layui.use('table', function () {
-        var table = layui.table;
+    table.render({
+        elem: '#demo',  //demo 表格ID
+        id: 'BookTable',  //表格重载时可根据该事件ID决定重载哪一个表格
+        toolbar: '#toolbarDemo',  //开启头部工具栏
+        cols: [[
+            { type: 'checkbox', fixed: 'left' },  //width 可不写
+            { field: 'BookId', title: 'ID', hide: true },
+            { field: 'ISBN', title: '图书编码', fixed: 'left' },
+            { field: 'BookName', title: '书名' },
+            { field: 'BookType', title: '图书类别' },
+            { field: 'Author', title: '作者' },
+            { field: 'Price', title: '价格', sort: true },
+            { field: 'Publishing', title: '出版社' },
+            { fixed: 'right', title: '操作', toolbar: '#barDemo' }  //行工具栏
+        ]],
+        response: {
+            statusName: 'state',    //规定数据状态的字段名称，默认：code
+            statusCode: 100        //规定成功的状态码，默认：0
+            //,msgName: 'hint'    //规定状态信息的字段名称，默认：msg
+            //,countName: 'total' //规定数据总数的字段名称，默认：count
+            //,dataName: 'rows' //规定数据列表的字段名称，默认：data
+        },
+        url: 'Bookview',
+        method: 'get',
+        where: { BookType: PageBookType },
+        //contentType: 'application/json',
+        parseData: function (res) {  //res 即为原始返回的数据
+            return {
+                "state": res.state,  //解析接口状态
+                "msg": res.msg,   //解析提示文本
+                "count": res.count,  //解析数据长度
+                "data": res.data    //解析数据列表(res:json字符串格式)
+            };
+        },
+        even: true,
+        page: true,
+        limit: 10,
+        limits: [5, 10, 15],
+        skin: 'line',
+        height: 'full-50',
+        done: function (res, curr, count) {
+            //如果是异步请求数据方式，res即为你接口返回的信息。
+            //如果是直接赋值的方式，res即为：{data: [], count: 99} data为当前页数据、count为数据总长度
 
-        table.render({
-            elem: '#demo',  //demo 表格ID
-            id: 'BookTable',  //表格重载时可根据该事件ID决定重载哪一个表格
-            toolbar: '#toolbarDemo',  //开启头部工具栏
-            cols: [[
-                { type: 'checkbox', fixed: 'left' },  //width 可不写
-                { field: 'BookId', title: 'ID', hide: true },
-                { field: 'ISBN', title: '图书编码', fixed: 'left' },
-                { field: 'BookName', title: '书名' },
-                { field: 'BookType', title: '图书类别' },
-                { field: 'Author', title: '作者' },
-                { field: 'Price', title: '价格', sort: true },
-                { field: 'Publishing', title: '出版社' },
-                { fixed: 'right', title: '操作', toolbar: '#barDemo' }  //行工具栏
-            ]],
-            response: {
-                statusName: 'state',    //规定数据状态的字段名称，默认：code
-                statusCode: 100        //规定成功的状态码，默认：0
-                //,msgName: 'hint'    //规定状态信息的字段名称，默认：msg
-                //,countName: 'total' //规定数据总数的字段名称，默认：count
-                //,dataName: 'rows' //规定数据列表的字段名称，默认：data
-            },
-            url: 'Bookview',
-            method: 'get',
-            parseData: function (res) {  //res 即为原始返回的数据
-                return {
-                    "state": res.state,  //解析接口状态
-                    "msg": res.msg,   //解析提示文本
-                    "count": res.count,  //解析数据长度
-                    "data": res.data    //解析数据列表(res:json字符串格式)
-                };
-            },
-            even: true,
-            page: true,
-            limit: 10,
-            limits: [5, 10, 15],
-            skin: 'line',
-            height: 500,
-            done: function (res, curr, count) {
-                //如果是异步请求数据方式，res即为你接口返回的信息。
-                //如果是直接赋值的方式，res即为：{data: [], count: 99} data为当前页数据、count为数据总长度
+            wlimit = res.data.length;  //当前页具体数据行数
+            wpage = curr;  //当前页码
 
-                wlimit = res.data.length;  //当前页具体数据行数
-                wpage = curr;  //当前页码
-
-                if (curr == 1 && count > wlimit) {
-                    defLimit = wlimit;
-                }
-                else if (curr == 1 && count < wlimit) {
-                    defLimit = 0;  //获取失败
-                }
+            //数据总数大于第一页显示的数据总数，则第一页显示的数据总数为默认要显示的数据总数
+            if (curr == 1 && count > wlimit) {
+                defLimit = wlimit;
             }
-        });
+            else if(count == wlimit){
+                defLimit = 0;  //获取失败
+            }
+        }
     });
 }
 
@@ -103,6 +105,7 @@ function TableLoad(TableID, pageNumber) {
             }
         }, 'data');  //data只重载数据
     });
+
 }
 
 //删除多条数据
@@ -117,20 +120,6 @@ function DeleteBook(data) {
         var pageNumber = wpage;
         var TableID = 'BookTable';
         TableLoad(TableID, pageNumber);
-
-        //layui.use('table', function () {
-        //    var table = layui.table;
-
-        //    //BookTable为table.render事件的ID
-        //    table.reload('BookTable', {
-        //        page: {
-        //            curr: wpage  //当前页
-        //        },
-        //        where: {
-        //            empty: "无意义"
-        //        }
-        //    }, 'data');  //data只重载数据
-        //});
 
         layer.alert(json.msg, { icon: 6 });
     }
@@ -254,6 +243,7 @@ function SelectType(data) {
     }
 }
 
+//左侧导航
 function leftbooknav(data) {
     var json = JSON.parse(data);
 
@@ -262,7 +252,7 @@ function leftbooknav(data) {
 
         for (var i = 0; i < json.data.length; i++) {
             if (i == 0) {
-                navString = '<dd><a href="'+ json.data[0].BOOKTYPEURL +'" target="BookIframe" >' + json.data[0].BOOKTYPENAME + '</a></dd>';
+                navString = '<dd><a href="' + json.data[0].BOOKTYPEURL +'" target="BookIframe"  >' + json.data[0].BOOKTYPENAME + '</a></dd>';
             }
             else {
                 navString += '<dd><a href="' + json.data[i].BOOKTYPEURL +'" target="BookIframe" >' + json.data[i].BOOKTYPENAME + '</a></dd>';
@@ -270,11 +260,38 @@ function leftbooknav(data) {
         }
 
         if (json.data.length > 0) {
-            $("#Booknav").empty();
+            //$("#Booknav").empty();
+
+            $("#leftnav").empty();
         }
+
+        var str = '<li class="layui-nav-item layui-nav-itemed"><a href="javascript:;">图书</a><dl class="layui-nav-child" id="Booknav" ></dl></li>';
+        $("#leftnav").append(str);
         $("#Booknav").append(navString);
+
+        //对动态生成的网页内容进行渲染
+        layui.use('element', function () {
+            var elementone = layui.element;
+            //elementone.init();  //渲染所有使用element模块的元素
+
+            elementone.render('nav', 'test');  //渲染lay-filter="test"的导航元素
+        });
+        
     }
     else {
         layer.alert(json.msg, { icon: 5 });
     }
+}
+
+//在子页面获取父页面a标签的文本值
+function LeftnavText() {
+    //获取当前页面路由里的路径，例如：/Home/Popular_science
+    var bookurl = window.location.pathname, urlArray = [];
+
+    //将路径分割为数组，并获取当前页面相对于父页面的相对路径
+    urlArray = bookurl.split('/');
+    bookurl = urlArray[2];  //Popular_science
+
+    //获取父页面a标签href属性值为 bookurl的文本值
+    PageBookType = $("a[href='" + bookurl + "']", parent.document).text();
 }

@@ -98,59 +98,63 @@
             return null;
         }
 
-        var layer;
         layui.use('layer', function () {
-            layer = layui.layer;
-        });
+            var layer = layui.layer;
 
-        $(document).ready(function () {
+            $(document).ready(function () {
             
-            var JsonData = { ID: ID };
-            var BookMethod = BookOne;
-            ajax("GET", "BookOne", JsonData, BookMethod);
+                var JsonData = { ID: ID };
+                var BookMethod = BookOne;
+                ajax("GET", "BookOne", JsonData, BookMethod);
 
-            //确定
-            $("#Alterbook").on("click", function () {
-                var ISBN = $("#ISBN").val();
-                var BookName = $("#BookName").val();
-                var BookType = $("#BookType").val();
-                var Author = $("#Author").val();
-                var Price = $("#Price").val();
-                var Publishing = $("#Publishing").val();
+                //确定
+                $("#Alterbook").on("click", function () {
+                    var ISBN = $("#ISBN").val();
+                    var BookName = $("#BookName").val();
+                    var BookType = $("#BookType").val();
+                    var Author = $("#Author").val();
+                    var Price = $("#Price").val();
+                    var Publishing = $("#Publishing").val();
 
-                if (cxISBN == ISBN && cxBookName == BookName && cxBookType == BookType
-                    && cxAuthor == Author && cxPrice == Price && cxPublishing == Publishing) {
-                    layer.alert('您没有修改任何信息', { icon: 5 });
-                }
-                else {
-                    if (ISBN != "" && BookName != "" && BookType != "" && Author != ""
-                        && Price != "" && Publishing != "") {
-                        var Priceformat = /(^[1-9]([0-9]+)?(\.[0-9]{1,2})?$)|(^(0){1}$)|(^[0-9]\.[0-9]([0-9])?$)/;  //匹配两位小数金额的正则表达式
-
-                        if (Priceformat.test(Price)) {
-                            var JsonData = {
-                                ID: ID, ISBN: ISBN, BookName: BookName, BookType: BookType,
-                                Author: Author, Price: Price, Publishing: Publishing
-                            };
-                            var BookMethod = AlterBooklist;
-                            ajax("PUT", "AlterBooklist", JsonData, BookMethod);
-                        }
-                        else {
-                            layer.alert('价格格式错误', { icon: 5 });
-                        }
+                    if (cxISBN == ISBN && cxBookName == BookName && cxBookType == BookType
+                        && cxAuthor == Author && cxPrice == Price && cxPublishing == Publishing) {
+                        layer.alert('您没有修改任何信息', { icon: 5 });
                     }
                     else {
-                        layer.alert('任何信息都不能为空', { icon: 5 });
+                        if (ISBN != "" && BookName != "" && BookType != "" && Author != ""
+                            && Price != "" && Publishing != "") {
+                            var Priceformat = /(^[1-9]([0-9]+)?(\.[0-9]{1,2})?$)|(^(0){1}$)|(^[0-9]\.[0-9]([0-9])?$)/;  //匹配两位小数金额的正则表达式
+
+                            if (Priceformat.test(Price)) {
+                                var JsonData = {
+                                    ID: ID, ISBN: ISBN, BookName: BookName, BookType: BookType,
+                                    Author: Author, Price: Price, Publishing: Publishing
+                                };
+                                var BookMethod = AlterBooklist;
+                                ajax("PUT", "AlterBooklist", JsonData, BookMethod);
+                            }
+                            else {
+                                layer.alert('价格格式错误', { icon: 5 });
+                            }
+                        }
+                        else {
+                            layer.alert('任何信息都不能为空', { icon: 5 });
+                        }
                     }
-                }
+                });
+
+                //取消
+                $("#cancel").on("click", function () {
+                    localStorage.setItem('editLoading', '0');  //将变量editLoading的值写入本地
+
+                    var layerindex = parent.layer.getFrameIndex(window.name);
+                    parent.layer.close(layerindex);
+                });
             });
 
-            //取消
-            $("#cancel").on("click", function () {
-                var layerindex = parent.layer.getFrameIndex(window.name);
-                parent.layer.close(layerindex);
-            });
         });
+
+        
     </script>
 </body>
 </html>

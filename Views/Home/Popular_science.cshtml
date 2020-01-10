@@ -8,7 +8,7 @@
 <html>
 <head>
     <meta name="viewport" content="width=device-width" />
-    <title>Book</title>
+    <title>Popular_science</title>
     <link href="~/content/plugins/layui/css/layui.css" rel="stylesheet" />
 
     <script src="~/content/plugins/jquery.min.js"></script>
@@ -16,13 +16,14 @@
     <script src="~/js/Book.js"></script>
 </head>
 <body>
+
     <div style="margin: auto; width: 90%; height: 90%; ">
         <table id="demo" class="layui-table" lay-filter="test"></table>
     </div>
 
     @*头部工具栏*@
     <script type="text/html" id="toolbarDemo">
-        <div class="layui-btn-container" >
+        <div class="layui-btn-container">
             <button class="layui-btn layui-btn-sm" lay-event="getCheckAdd">添加</button>
             <button class="layui-btn layui-btn-sm" lay-event="getCheckDel">删除</button>
         </div>
@@ -35,7 +36,7 @@
     </script>
 
     <script>
-        //wpage当前页码, wlimit当前页的具体行数, defLimit设置每页应该显示的数据行数
+        //wpage当前页码, wlimit当前页的具体行数, defLimit设置每页应该显示的数据行数, 书籍类型PageBookType
         var wpage, wlimit, defLimit, PageBookType;
 
         $(document).ready(function () {
@@ -44,6 +45,7 @@
                 var table = layui.table, layer = layui.layer;
 
                 LeftnavText();
+
                 Book(table, PageBookType);
 
                 //头工具栏  test: lay-filter="test"
@@ -53,8 +55,6 @@
 
                     switch (obj.event) {
                         case 'getCheckAdd':  //添加
-                            var Loading = 1;
-                            localStorage.setItem('addLoading', '1');  //将addloading=1存储到本地用作重载判断
                             var Addbook = layer.open({
                                 title: '添加',
                                 type: 2,
@@ -64,18 +64,13 @@
                                 scrollbar: true,
                                 content: 'Addbook',
                                 anim: 5,
-                                cancel: function () {
-                                    Loading = 0;  //不重载
-                                },
                                 end: function () {
-                                    //关闭弹窗或取消添加，数据不重载
                                     //如果当前页显示的数据行数未超过默认显示的数据行数，则添加数据后重载表格
-                                    if ((Loading == 1 && localStorage.getItem('addLoading') == 1 ((defLimit > wlimit) || (defLimit == 0)))) {
+                                    if ((defLimit > wlimit) || (defLimit == 0)) {
                                         var TableID = 'BookTable';
                                         var pageNumber = wpage;
                                         TableLoad(TableID, pageNumber);
                                     }
-                                    localStorage.removeItem('addLoading');
                                 }
                             });
                             break;
@@ -95,7 +90,7 @@
                                 else {
                                     layer.alert('获取将要删除数据的ID失败', { icon: 5 });
                                 }
-                            
+
                             }
                             else {
                                 layer.alert('请先选择您要删除的数据', { icon: 5 });
@@ -111,8 +106,6 @@
                 table.on('tool(test)', function (obj) {
 
                     if (obj.event === 'edit') {  //编辑
-                        var Loading = 1;
-                        localStorage.setItem('editLoading', '1');  //将变量editLoading=1存储到本地
 
                         var editBook = layer.open({
                             title: '编辑',  //标题
@@ -122,17 +115,10 @@
                             maxmin: true,  //最大最小化
                             scrollbar: true,  //滚动条
                             content: 'AlterBook?ID=' + obj.data.BookId,
-                            cancel: function () {
-                                Loading = 0;
-                            },
                             end: function () {
-                                //关闭弹窗或取消编辑，数据不重载
-                                if (Loading == 1 && localStorage.getItem('editLoading') == 1) {
-                                    var TableID = 'BookTable';
-                                    var pageNumber = wpage;
-                                    TableLoad(TableID, pageNumber);
-                                }
-                                localStorage.removeItem('editLoading');  //删除editLoading
+                                var TableID = 'BookTable';
+                                var pageNumber = wpage;
+                                TableLoad(TableID, pageNumber);
                             }
                         });
                     }
@@ -151,5 +137,6 @@
 
         });
     </script>
+
 </body>
 </html>

@@ -73,6 +73,11 @@ namespace Library.Controllers
             return View();
         }
 
+        public IActionResult Popular_science()
+        {
+            return View();
+        }
+
         public IActionResult Addbook()
         {
             return View();
@@ -118,24 +123,24 @@ namespace Library.Controllers
         }
 
         //表格分页显示
-        public string Bookview(int page, int limit)
+        public string Bookview(int page, int limit, string BookType)
         {
             try
             {
                 using(OracleConnection conn = new OracleConnection(OracleConnectionString))
                 {
-                    string sql = "select BookId from Book where Isdelete = :Isdelete";
+                    string sql = "select BookId from Book where Isdelete = :Isdelete and BookType = :BookType";
 
-                    int records = conn.Query(sql, new { Isdelete = 0 }).Count();
+                    int records = conn.Query(sql, new { Isdelete = 0, BookType }).Count();
 
                     if(records > 0)
                     {
                         string sqlone = "select BookId, ISBN, BookName, BookType, Author, Price, Publishing " +
-                            " from book where Isdelete = :Isdelete and rownum <= :limit";
+                            " from book where Isdelete = :Isdelete and BookType = :BookType and rownum <= :limit";
 
                         if(page == 1)
                         {
-                            var booklist = conn.Query<Book>(sqlone, new { Isdelete = 0, limit }).ToList();
+                            var booklist = conn.Query<Book>(sqlone, new { Isdelete = 0, BookType, limit }).ToList();
 
                             if(booklist.Count > 0)
                             {
@@ -154,9 +159,9 @@ namespace Library.Controllers
                         {
                             int PageLimit = (page - 1) * limit;
                             sqlone = sqlone +  " and BookId not in (select BookId from Book " +
-                                " where rownum <= :PageLimit and Isdelete = :Isdelete)";
+                                " where Isdelete = :Isdelete and BookType = :BookType and rownum <= :PageLimit)";
 
-                            var booklist = conn.Query<Book>(sqlone, new { Isdelete = 0, limit, PageLimit }).ToList();
+                            var booklist = conn.Query<Book>(sqlone, new { Isdelete = 0, BookType, limit, PageLimit }).ToList();
 
                             if (booklist.Count > 0)
                             {

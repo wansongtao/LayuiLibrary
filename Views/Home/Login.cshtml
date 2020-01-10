@@ -77,14 +77,6 @@
 
     <script>
 
-        //(function(){
-        //    if (getIsWeb() === false) {
-        //        alert('建议在web服务容器中打开此网页，如iis、Apache Tomcat、Nginx、node server等。当前状态下被限制了很多功能。');
-        //    }
-
-        //    pageKeepTop();
-        //}());
-
         $(function () {
 
             //首次进入页面让第一个文本框获得焦点,这样用户直接回车即可登录。
@@ -141,13 +133,6 @@
 
                             var BookMethod = Login;
                             ajax("GET", "Home/BookLogin", JsonData, BookMethod);
-
-                            //if (JsonData.userAcc === 'admin' && JsonData.passwd === '123') {
-                            //    setTimeout("top.location.replace('Home/Index')", "1000");
-                            //} else {
-                            //    layer.msg('用户名或密码错误', { anim: 10, icon: 0 });
-                            //    $("#submitUser").removeClass("layui-btn-disabled").prop("disabled", false).text("登 入");
-                            //}
                         }
                         else {
                             layer.alert('密码格式错误', { icon: 5 });

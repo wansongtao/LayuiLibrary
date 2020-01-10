@@ -111,3 +111,4 @@ C:\Library\obj\Debug\netcoreapp3.1\Razor\Views\Home\Index.cshtml.g.cs
 C:\Library\obj\Debug\netcoreapp3.1\Razor\Views\Home\Addbook.cshtml.g.cs
 C:\Library\obj\Debug\netcoreapp3.1\Razor\Views\Home\AlterBook.cshtml.g.cs
 C:\Library\obj\Debug\netcoreapp3.1\Razor\Views\Home\Literature.cshtml.g.cs
+C:\Library\obj\Debug\netcoreapp3.1\Razor\Views\Home\Popular_science.cshtml.g.cs
